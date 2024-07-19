@@ -1,14 +1,22 @@
 import { useSelector } from 'react-redux'
 import { Produto as ProdutoType } from '../App'
 import Produto from '../components/Produto'
-
 import * as S from './styles'
 import { RootReducer } from '../store'
-import { useGetProdutosQuery } from '../services/api'
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { setProdutos } from '../store/reducers/produtos'
 
 const ProdutosComponent = () => {
+  const dispatch = useDispatch()
   const favoritos = useSelector((state: RootReducer) => state.favoritos.itens)
-  const { data: produtos } = useGetProdutosQuery()
+  const produtos = useSelector((state: RootReducer) => state.produtos)
+
+  useEffect(() => {
+    fetch('https://fake-api-tau.vercel.app/api/ebac_sports')
+      .then((res) => res.json())
+      .then((data) => dispatch(setProdutos(data)))
+  }, [dispatch])
 
   const produtoEstaNosFavoritos = (produto: ProdutoType) => {
     return favoritos.some((item) => item.id === produto.id)
@@ -18,7 +26,7 @@ const ProdutosComponent = () => {
     <>
       <S.Produtos>
         {produtos &&
-          produtos.map((produto) => (
+          produtos.map((produto: ProdutoType) => (
             <Produto
               estaNosFavoritos={produtoEstaNosFavoritos(produto)}
               key={produto.id}
